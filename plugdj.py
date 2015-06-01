@@ -85,7 +85,15 @@ class Room(LoggerMixin):
         return self._delete(urljoin("/_/chat", msgid))
 
     def moderate_skip(self):
-        pass
+        # TODO: decide whether to track room state
+        room_state = self.get_state()
+        return self._post("/_/booth/skip", json={
+            "userID": room_state["booth"]["currentDJ"],
+            "historyID": room_state["playback"]["historyID"]
+        })
+
+    def get_state(self):
+        return self._get("/_/rooms/state").json()["data"][0]
 
     def send_chat(self, msg):
         if not isinstance(msg, basestring):
