@@ -62,7 +62,7 @@ class PlugDJ(LoggerMixin):
         # TODO: remove
         svtime = datetime.strptime(js_var("_st", connecting.text),
                                    "%Y-%m-%d %H:%M:%S.%f")
-        return PlugSock(js_var("_jm", connecting.text), **sockopts)
+        return PlugSock2(js_var("_jm", connecting.text), **sockopts)
 
     def _post(self, path, **kwargs):
         return self._session.post(urljoin(self.BASE, path), **kwargs)
