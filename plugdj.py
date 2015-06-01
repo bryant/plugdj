@@ -38,7 +38,7 @@ class PlugDJ(LoggerMixin):
     def __init__(self, email, password, sockopts=None):
         self._session = Session()
         self._session.headers.update({"User-Agent": "plugAPI_3.2.1"})
-        self.socket = self._login(email, password, sockopts)
+        self.websocket = self._login(email, password, sockopts)
 
     def _login(self, email, password, sockopts=None):
         csrf = js_var("_csrf", self._get("/").text)
@@ -83,7 +83,7 @@ class Room(LoggerMixin):
         pass
 
     def send_chat(self, msg):
-        return self.plugobj.socket.send_chat(msg)
+        return self.websocket.send_chat(msg)
 
     def user_info(self):
         return self._get("/_/users/me")
@@ -122,6 +122,7 @@ class Room(LoggerMixin):
 
         # could possibly cause ref cycle in future. consider weakref.
         self.plugobj = plugobj
+        self.websocket = plugobj.websocket
 
         self.logger.debug("Room: user_info returned %r" % self.user_info().text)
         req = self._post("/_/rooms/join", json={"slug": room})
