@@ -83,6 +83,13 @@ class Room(LoggerMixin):
         pass
 
     def send_chat(self, msg):
+        if not isinstance(msg, basestring):
+            self.logger.info("Room.send_chat: converted msg %r into a string" %
+                             msg)
+            msg = str(msg)
+        if len(msg):
+            self.logger.info("Room.send_chat: msg is longer than 256 or "
+                             "whatever.")
         return self.websocket.send_chat(msg)
 
     def user_info(self):
