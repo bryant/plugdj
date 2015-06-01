@@ -150,9 +150,12 @@ class PlugSock(LoggerMixin):
         self.auth = auth  # TODO: don't store if unnecessary
 
     def authenticate(self, tok):
+        """ sends auth token and *blocks till confirmation is received.* """
         self.logger.debug("PlugSock: sending auth.")
         self.psend("auth", tok)
-        self.expect_reply({"a": "ack", "p": "1"})
+        reply = self.precv()
+        if reply.get("a") != "ack" or reply.get("p") != "1":
+            raise LoginError
         self.logger.debug("PlugSock: auth went well.")
         return self
 
