@@ -32,6 +32,8 @@ class LoggerMixin(object):
     logger = getLogger(__name__)
 
 class PlugDJ(LoggerMixin):
+    """ models actions and events of a single user. """
+
     BASE = "https://plug.dj"
     LOGIN = "/_/auth/login"
 
@@ -73,6 +75,9 @@ class PlugDJ(LoggerMixin):
     def join_room(self, room):
         return Room(room, self)
 
+    def user_info(self):
+        return self._get("/_/users/me").json()["data"][0]
+
 class Room(LoggerMixin):
     """ room state. NOTE: invalidated upon next call to PlugDJ.join_room. """
 
@@ -91,9 +96,6 @@ class Room(LoggerMixin):
             self.logger.info("Room.send_chat: msg is longer than 256 or "
                              "whatever.")
         return self.websocket.send_chat(msg)
-
-    def user_info(self):
-        return self._get("/_/users/me")
 
     # amounts to stateful REST, tsk.
     PER_ROOM_ENDPOINTS = {
@@ -131,7 +133,6 @@ class Room(LoggerMixin):
         self.plugobj = plugobj
         self.websocket = plugobj.websocket
 
-        self.logger.debug("Room: user_info returned %r" % self.user_info().text)
         req = self._post("/_/rooms/join", json={"slug": room})
         self.logger.debug("Room: join_room returned " + req.text)
 
