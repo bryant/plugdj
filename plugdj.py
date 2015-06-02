@@ -161,8 +161,8 @@ class PlugSock(LoggerMixin):
     def authenticate(self, tok):
         """ sends auth token and *blocks till confirmation is received.* """
         self.logger.debug("PlugSock: sending auth.")
-        self.psend("auth", tok)
-        reply = self.precv()
+        self.send("auth", tok)
+        reply = self.recv()
         if reply.get("a") != "ack" or reply.get("p") != "1":
             raise LoginError
         self.logger.debug("PlugSock: auth went well.")
@@ -170,21 +170,21 @@ class PlugSock(LoggerMixin):
 
     def send_chat(self, msg):
         # TODO: investigate length limits
-        return self.psend("chat", msg)
+        return self.send("chat", msg)
 
-    def psend(self, event_type, event_data):
+    def send(self, event_type, event_data):
         """ sends generic json packed in plug's format. """
         msg = self.pack_msg(event_type, event_data)
         self.socket.send(json.dumps(msg))
         return self
 
-    def precv(self):
+    def recv(self):
         reply = json.loads(self.socket.recv())
         self.logger.debug("PlugSock: reply had length " + str(len(reply)))
         return reply[0]
 
     def expect_reply(self, checks):
-        reply = self.precv()
+        reply = self.recv()
         for k, v in checks.iteritems():
             if reply.get(k) != v:
                 raise ServerShenanigans("Unmatched key %r in: %r" % (k, reply))
@@ -206,7 +206,7 @@ class PlugSock2(PlugSock):
 
     def authenticate(self, tok):
         self.logger.debug("PlugSock2: sending auth, skipping reply check.")
-        self.psend("auth", tok)
+        self.send("auth", tok)
 
     def received_message(self, m):
         self.logger.debug("PlugSock2: received %r" % m.data)
