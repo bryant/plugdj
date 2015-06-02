@@ -28,10 +28,9 @@ def ms_since_epoch(dt):
     delta = (dt - datetime(1970, 1, 1))
     return int(round(delta.total_seconds() * 1000))
 
-class LoggerMixin(object):
-    logger = getLogger(__name__)
+logger = getLogger(__name__)
 
-class PlugDJ(LoggerMixin):
+class PlugDJ(object):
     """ models actions and events of a single user. """
 
     BASE = "https://plug.dj"
@@ -78,7 +77,7 @@ class PlugDJ(LoggerMixin):
     def user_info(self):
         return self._get("/_/users/me").json()["data"][0]
 
-class Room(LoggerMixin):
+class Room(object):
     """ room state. NOTE: invalidated upon next call to PlugDJ.join_room. """
 
     def chat_delete(self, msgid):
@@ -97,12 +96,10 @@ class Room(LoggerMixin):
 
     def send_chat(self, msg):
         if not isinstance(msg, basestring):
-            self.logger.info("Room.send_chat: converted msg %r into a string" %
-                             msg)
+            logger.info("Room.send_chat: converted msg %r into a string" % msg)
             msg = str(msg)
         if len(msg):
-            self.logger.info("Room.send_chat: msg is longer than 256 or "
-                             "whatever.")
+            logger.info("Room.send_chat: msg is longer than 256 or whatever.")
         return self.websocket.send_chat(msg)
 
     # amounts to stateful REST, tsk.
@@ -142,9 +139,9 @@ class Room(LoggerMixin):
         self.websocket = plugobj.websocket
 
         req = self._post("/_/rooms/join", json={"slug": room})
-        self.logger.debug("Room: join_room returned " + req.text)
+        logger.debug("Room: join_room returned " + req.text)
 
-class PlugSock(LoggerMixin):
+class PlugSock(object):
     """ whose primary purpose is to receive pushes and send chats. """
 
     PLUG_WS_ENDPOINT = "wss://godj.plug.dj:443/socket"
@@ -160,12 +157,12 @@ class PlugSock(LoggerMixin):
 
     def authenticate(self, tok):
         """ sends auth token and *blocks till confirmation is received.* """
-        self.logger.debug("PlugSock: sending auth.")
+        logger.debug("PlugSock: sending auth.")
         self.send("auth", tok)
         reply = self.recv()
         if reply.get("a") != "ack" or reply.get("p") != "1":
             raise LoginError
-        self.logger.debug("PlugSock: auth went well.")
+        logger.debug("PlugSock: auth went well.")
         return self
 
     def send_chat(self, msg):
@@ -180,7 +177,7 @@ class PlugSock(LoggerMixin):
 
     def recv(self):
         reply = json.loads(self.socket.recv())
-        self.logger.debug("PlugSock: reply had length " + str(len(reply)))
+        logger.debug("PlugSock: reply had length " + str(len(reply)))
         return reply[0]
 
     def expect_reply(self, checks):
@@ -205,14 +202,14 @@ class PlugSock2(PlugSock):
         self.authenticate(self.auth)
 
     def authenticate(self, tok):
-        self.logger.debug("PlugSock2: sending auth, skipping reply check.")
+        logger.debug("PlugSock2: sending auth, skipping reply check.")
         self.send("auth", tok)
 
     def received_message(self, m):
-        self.logger.debug("PlugSock2: received %r" % m.data)
+        logger.debug("PlugSock2: received %r" % m.data)
 
     def closed(self, code, reason=None):
-        self.logger.debug("PlugSock2: closed: %r %r" % (code, reason))
+        logger.debug("PlugSock2: closed: %r %r" % (code, reason))
 
 if __name__ == "__main__":
     import logging
