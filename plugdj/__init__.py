@@ -27,6 +27,10 @@ class PlugDJ(PlugREST):
         return self.websocket_cls(js_var("_jm", connecting.text), listener,
                                   **sockopts)
 
+    def set_listener(self, listener):
+        self.ws.listener = listener
+        return self
+
     def send_chat(self, msg):
         if not isinstance(msg, basestring):
             logger.info("Room.send_chat: converted msg %r into a string" % msg)

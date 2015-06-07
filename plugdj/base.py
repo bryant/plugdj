@@ -164,13 +164,15 @@ class PlugSock(SockBase):
 
             def received_message(innerself, msg):
                 logger.debug("_ThreadedPlugSock: received %r" % msg.data)
-                self.listener(msg)
+
+                if callable(self.listener):
+                    self.listener(msg)
 
             def closed(innerself, code, reason=None):
                 msg = "_ThreadedPlugSock: closed: %r %r" % (code, reason)
                 logger.debug(msg)
 
         self.auth = auth
-        self.listener = listener or (lambda n: n)
+        self.listener = listener
         self.socket = _ThreadedPlugSock(self.ws_endpoint)
         self.socket.connect()
