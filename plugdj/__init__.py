@@ -27,24 +27,6 @@ class PlugDJ(PlugREST):
         return self.websocket_cls(js_var("_jm", connecting.text), listener,
                                   **sockopts)
 
-class Room(object):
-    """ room state. NOTE: invalidated upon next call to PlugDJ.join_room. """
-
-    def __init__(self, room, rest, ws):
-        """ instances should be obtained from PlugDJ.join_room. """
-
-        self.rest = rest
-        self.ws = ws
-
-    def chat_delete(self, msgid):
-        return self._delete(urljoin("/_/chat", msgid))
-
-    def moderate_skip(self):
-        # TODO: decide whether to track room state
-        s = self.rest.room_state()["data"][0]
-        return self.rest.moderate_skip(s["booth"]["currentDJ"],
-                                       s["playback"]["historyID"])
-
     def send_chat(self, msg):
         if not isinstance(msg, basestring):
             logger.info("Room.send_chat: converted msg %r into a string" % msg)
