@@ -2,17 +2,17 @@ from .events import from_json
 from .util import js_var, InvalidLogin, logger
 from .base import SockBase, PlugREST, PlugSock
 
-class PlugDJ(object):
+class PlugDJ(PlugREST):
     """ models actions and events of a single user. """
 
     websocket_cls = PlugSock
 
     def __init__(self, email, password, listener=None):
-        self.rest = rest = PlugREST()
+        super(PlugDJ, self).__init__()
         self.ws = self.login(email, password).acquire_socket(listener)
 
     def login(self, email, password):
-        if self.rest.login(email, password).get("status") != "ok":
+        if super(PlugDJ, self).login(email, password).get("status") != "ok":
             raise InvalidLogin(email, password)
         return self
         # ^ socket acquisition should happen immediately after
@@ -22,19 +22,10 @@ class PlugDJ(object):
 
         # expect next GET / to return the "Connecting..." page which will
         # contain our websocket auth token.
-        connecting = self.rest._get_root()
+        connecting = super(PlugDJ, self)._get_root()
         sockopts = sockopts or {}
         return self.websocket_cls(js_var("_jm", connecting.text), listener,
                                   **sockopts)
-
-    def join_room(self, room):
-        self.rest.join_room(room)
-        req = self.rest.join_room(room)
-        # TODO: handle invalid room
-        logger.debug("Room: join_room returned %s" % req)
-        return self
-
-    # TODO: copy appropriate PlugREST calls into class namespace
 
 class Room(object):
     """ room state. NOTE: invalidated upon next call to PlugDJ.join_room. """
