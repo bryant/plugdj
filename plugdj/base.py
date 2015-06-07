@@ -165,8 +165,14 @@ class PlugSock(SockBase):
             def received_message(innerself, msg):
                 logger.debug("_ThreadedPlugSock: received %r" % msg.data)
 
+                try:
+                    msgs = json.loads(str(msg))
+                except ValueError:
+                    return  # not a plug message.
+
                 if callable(self.listener):
-                    self.listener(msg)
+                    for msg in msgs:
+                        self.listener(msg)
 
             def closed(innerself, code, reason=None):
                 msg = "_ThreadedPlugSock: closed: %r %r" % (code, reason)
