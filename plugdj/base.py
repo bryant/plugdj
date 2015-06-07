@@ -1,7 +1,7 @@
 from urlparse import urljoin
 from requests import Session
 from ws4py.client.threadedclient import WebSocketClient
-from .util import js_var, logger, ms_since_epoch
+from .util import js_var, logger, ms_since_epoch, LoginError
 import json
 
 class PlugREST(object):
