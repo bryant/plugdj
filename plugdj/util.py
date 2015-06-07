@@ -1,3 +1,4 @@
+from datetime import datetime
 from logging import getLogger
 from re import search
 from md5 import md5
@@ -21,7 +22,8 @@ def js_var(var, raw):
     match = search(lestr, raw)
     return None if match is None else match.group(1)
 
-def ms_since_epoch(dt):
+def ms_since_epoch(dt=None):
+    dt = dt or datetime.now()
     delta = (dt - datetime(1970, 1, 1))
     return int(round(delta.total_seconds() * 1000))
 

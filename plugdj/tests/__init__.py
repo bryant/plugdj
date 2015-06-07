@@ -7,6 +7,6 @@ def get_plug(listener=None):
 def test_login():
     p = get_plug()
 
-def test_join_room():
-    p = get_plug()
-    p.join_room(creds.room)
+#def test_join_room():
+#    p = get_plug()
+#    p.join_room(creds.room)

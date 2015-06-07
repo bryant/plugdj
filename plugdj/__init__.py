@@ -1,6 +1,6 @@
 from ws4py.client.threadedclient import WebSocketClient
 from .events import from_json
-from .util import js_var, InvalidLogin
+from .util import js_var, InvalidLogin, logger
 from .base import SockBase, PlugREST
 
 class PlugSock(SockBase):
@@ -15,7 +15,7 @@ class PlugSock(SockBase):
                 self.authenticate(self.auth)
 
             def received_message(innerself, msg):
-                logger.debug("_ThreadedPlugSock: received %r" % m.data)
+                logger.debug("_ThreadedPlugSock: received %r" % msg.data)
                 self.listener(msg)
 
             def closed(innerself, code, reason=None):
@@ -23,7 +23,7 @@ class PlugSock(SockBase):
                 logger.debug(msg)
 
         self.auth = auth
-        self.listener = listener
+        self.listener = listener or (lambda n: n)
         self.socket = _ThreadedPlugSock(self.ws_endpoint)
         self.socket.connect()
 
@@ -52,7 +52,7 @@ class PlugDJ(object):
         return self.websocket_cls(js_var("_jm", connecting.text), listener,
                                   **sockopts)
 
-    def join_room(self, room, handler):
+    def join_room(self, room):
         self.rest.join_room(room)
         req = self.rest.join_room(room)
         # TODO: handle invalid room

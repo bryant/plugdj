@@ -1,7 +1,6 @@
-from datetime import datetime
 from urlparse import urljoin
 from requests import Session
-from .util import js_var
+from .util import js_var, logger, ms_since_epoch
 import json
 
 class PlugREST(object):
@@ -149,6 +148,6 @@ class SockBase(object):
         return list(self.recv())
 
     def pack_msg(self, ty, dat):
-        return {"a": ty, "p": dat, "t": ms_since_epoch(datetime.now())}
+        return {"a": ty, "p": dat, "t": ms_since_epoch()}
 
 
