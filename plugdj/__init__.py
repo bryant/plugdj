@@ -56,8 +56,8 @@ class PlugDJ(object):
         self.rest.join_room(room)
         req = self.rest.join_room(room)
         # TODO: handle invalid room
-        logger.debug("Room: join_room returned " + req)
-        return Room(room, self.rest, self.ws)
+        logger.debug("Room: join_room returned %s" % req)
+        return self
 
     # TODO: copy appropriate PlugREST calls into class namespace
 
