@@ -3,4 +3,5 @@
 *.pyo
 *.egg-info
 *.egg
+_creds.py
 misc
