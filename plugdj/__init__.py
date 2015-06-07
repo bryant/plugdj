@@ -33,8 +33,8 @@ class PlugDJ(PlugREST):
 
     def send_chat(self, msg):
         if not isinstance(msg, basestring):
-            logger.info("Room.send_chat: converted msg %r into a string" % msg)
             msg = str(msg)
+            logger.info("Room.send_chat: converted msg into a string: " + msg)
         return self.ws.send_chat(msg)
 
 # TODO: remove.

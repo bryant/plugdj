@@ -126,7 +126,7 @@ class SockBase(object):
 
     def authenticate(self, tok):
         """ sends auth token. """
-        logger.debug("PlugSock: sending auth.")
+        logger.debug("PlugSock: sending auth: " + tok)
         self.send("auth", tok)
         return self
 
