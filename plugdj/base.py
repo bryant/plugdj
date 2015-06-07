@@ -26,13 +26,16 @@ class PlugREST(object):
             return req
         return req.json()
 
+    def _get_root(self):
+        return self._session.get(urljoin(self.rest_url_base, "/"))
+
     @classmethod
     def to_url(cls, endpoint):
         return urljoin(cls.rest_url_base, "/_/" + endpoint)
 
     def login(self, email, password):
         # request root of site
-        csrf = js_var("_csrf", self._session.get(self.rest_url_base + "/").text)
+        csrf = js_var("_csrf", self._get_root().text)
         if csrf is None:
             raise LoginError(resp)
 

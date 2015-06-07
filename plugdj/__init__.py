@@ -47,7 +47,7 @@ class PlugDJ(object):
 
         # expect next GET / to return the "Connecting..." page which will
         # contain our websocket auth token.
-        connecting = self._get("/")
+        connecting = self.rest._get_root()
         sockopts = sockopts or {}
         return self.websocket_cls(js_var("_jm", connecting.text), listener,
                                   **sockopts)
