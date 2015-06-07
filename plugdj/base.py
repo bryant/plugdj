@@ -1,6 +1,7 @@
 from datetime import datetime
 from urlparse import urljoin
 from requests import Session
+from .util import js_var
 import json
 
 class PlugREST(object):
@@ -31,7 +32,7 @@ class PlugREST(object):
 
     def login(self, email, password):
         # request root of site
-        csrf = js_var("_csrf", self._session.get("/").text)
+        csrf = js_var("_csrf", self._session.get(self.rest_url_base + "/").text)
         if csrf is None:
             raise LoginError(resp)
 

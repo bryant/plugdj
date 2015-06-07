@@ -1,4 +1,6 @@
 from logging import getLogger
+from re import search
+from md5 import md5
 
 logger = getLogger(__name__)
 
@@ -6,14 +8,17 @@ class MalformedEvent(Exception): pass
 
 class ServerShenanigans(Exception): pass
 
-class InvalidLogin(Exception): pass
+class InvalidLogin(Exception):
+    def __init__(self, email, pw):
+        msg = "email = %s; md5(password) = %s" % (email, md5(pw).hexdigest())
+        super(InvalidLogin, self).__init__(msg)
 
 class LoginError(Exception): pass
 
 def js_var(var, raw):
     """ really hacky-hack helper to extract js str var decls. """
     lestr = r"\b{0}\s*=\s*\"([^\"]+)".format(var)
-    match = re.search(lestr, raw)
+    match = search(lestr, raw)
     return None if match is None else match.group(1)
 
 def ms_since_epoch(dt):

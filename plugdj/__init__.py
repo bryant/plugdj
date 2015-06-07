@@ -1,7 +1,7 @@
 from ws4py.client.threadedclient import WebSocketClient
 from .events import from_json
-from .util import js_var
-from .base import SockBase
+from .util import js_var, InvalidLogin
+from .base import SockBase, PlugREST
 
 class PlugSock(SockBase):
     """ default ws impl based on ws4py. spawns its own thread. """
@@ -38,7 +38,7 @@ class PlugDJ(object):
 
     def login(self, email, password):
         if self.rest.login(email, password).get("status") != "ok":
-            raise InvalidLogin
+            raise InvalidLogin(email, password)
         return self
         # ^ socket acquisition should happen immediately after
 
