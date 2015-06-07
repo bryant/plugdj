@@ -1,31 +1,6 @@
-from ws4py.client.threadedclient import WebSocketClient
 from .events import from_json
 from .util import js_var, InvalidLogin, logger
-from .base import SockBase, PlugREST
-
-class PlugSock(SockBase):
-    """ default ws impl based on ws4py. spawns its own thread. """
-
-    _recv = lambda self: self.socket.recv()
-    _send = lambda self, m: self.socket.send(m)
-
-    def __init__(self, auth, listener, **kwargs):
-        class _ThreadedPlugSock(WebSocketClient):
-            def opened(innerself):
-                self.authenticate(self.auth)
-
-            def received_message(innerself, msg):
-                logger.debug("_ThreadedPlugSock: received %r" % msg.data)
-                self.listener(msg)
-
-            def closed(innerself, code, reason=None):
-                msg = "_ThreadedPlugSock: closed: %r %r" % (code, reason)
-                logger.debug(msg)
-
-        self.auth = auth
-        self.listener = listener or (lambda n: n)
-        self.socket = _ThreadedPlugSock(self.ws_endpoint)
-        self.socket.connect()
+from .base import SockBase, PlugREST, PlugSock
 
 class PlugDJ(object):
     """ models actions and events of a single user. """

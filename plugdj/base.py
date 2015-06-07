@@ -1,5 +1,6 @@
 from urlparse import urljoin
 from requests import Session
+from ws4py.client.threadedclient import WebSocketClient
 from .util import js_var, logger, ms_since_epoch
 import json
 
@@ -150,4 +151,26 @@ class SockBase(object):
     def pack_msg(self, ty, dat):
         return {"a": ty, "p": dat, "t": ms_since_epoch()}
 
+class PlugSock(SockBase):
+    """ default ws impl based on ws4py. spawns its own thread. """
 
+    _recv = lambda self: self.socket.recv()
+    _send = lambda self, m: self.socket.send(m)
+
+    def __init__(self, auth, listener, **kwargs):
+        class _ThreadedPlugSock(WebSocketClient):
+            def opened(innerself):
+                self.authenticate(self.auth)
+
+            def received_message(innerself, msg):
+                logger.debug("_ThreadedPlugSock: received %r" % msg.data)
+                self.listener(msg)
+
+            def closed(innerself, code, reason=None):
+                msg = "_ThreadedPlugSock: closed: %r %r" % (code, reason)
+                logger.debug(msg)
+
+        self.auth = auth
+        self.listener = listener or (lambda n: n)
+        self.socket = _ThreadedPlugSock(self.ws_endpoint)
+        self.socket.connect()
