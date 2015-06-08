@@ -64,17 +64,29 @@ class PlugREST(object):
     def history(self):
         raise NotImplemented("rooms/history")
 
-    def moderate_add_dj(self):
-        raise NotImplemented("booth/add")
+    def moderate_add_dj(self. user_id):
+        """ adds a dj to the waitlist (nee booth). """
+        return self._post("booth/add", json={"id": user_id})
 
-    def moderate_ban(self):
-        raise NotImplemented("bans/add")
+    def moderate_ban_user(self, user_id, reason, duration):
+        """ does what the tin label indicates. cf. https://github.com/plugCubed/plugAPI/wiki/%5Bactions%5D%20moderateBanUser
+        @reason: int; [1..5]
+        @duration: string; 'h', 'd', 'f' = hour, day, 5ever
+        """
+        json = {"userID": user_id, "reason": reason, "duration": duration}
+        return self._post("bans/add", json=json)
 
-    def moderate_booth(self):
-        raise NotImplemented("booth")
+    def join_booth(self):
+        """ possibly unsupported. cf. `PlugAPI.prototype.joinBooth`. """
+        return self._post("booth")
 
-    def moderate_move_dj(self):
-        raise NotImplemented("booth/move")
+    def leave_booth(self):
+        """ possibly unsupported. cf. `PlugAPI.prototype.leaveBooth`. """
+        return self._delete("booth")
+
+    def moderate_move_dj(self, user_id, position):
+        json = {"userID": user_id, "position": position}
+        return self._post("booth/move", json=json)
 
     def moderate_mute(self):
         raise NotImplemented("mutes")
@@ -94,8 +106,24 @@ class PlugREST(object):
     def moderate_unmute(self):
         raise NotImplemented("mutes/")
 
-    def playlist(self):
-        raise NotImplemented("playlists")
+    def activate_playlist(self, playlist_id):
+        return self._put("playlists/%s/activate" % playlist_id)
+
+    def add_song_to_playlist(self, playlist_id, song_id):
+        json = {"media": song_id, "append": True}
+        return self._get("playlists/%s/media/insert" % playlist_id, json=json)
+
+    def create_playlist(self, name):
+        return self._post("playlists", json={"name": name})
+
+    def delete_playlist(self, playlist_id):
+        return self._delete("playlists/%s" % playlist_id)
+
+    def get_playlist_medias(self, playlist_id):
+        return self._get("playlists/%s/media" % playlist_id)
+
+    def shuffle_playlist(self, playlist_id):
+        return self._put("playlists/%s/shuffle" % playlist_id)
 
     def room_cycle_booth(self):
         raise NotImplemented("booth/cycle")
@@ -103,17 +131,37 @@ class PlugREST(object):
     def room_info(self):
         raise NotImplemented("rooms/update")
 
-    def room_lock_booth(self):
-        raise NotImplemented("booth/lock")
+    def moderate_lock_wait_list(self, locked, clear):
+        return self._put("booth/lock", json={"isLocked": locked,
+                                             "removeAllDJs": clear})
 
     def user_get_avatars(self):
-        raise NotImplemented("store/inventory/avatars")
+        return self._get("store/inventory/avatars")
 
-    def user_set_avatar(self):
-        raise NotImplemented("users/avatar")
+    def user_set_avatar(self, avatar_id):
+        return self._put("users/avatar", json={"id": avatar_id})
 
-    def user_set_status(self):
-        raise NotImplemented("users/status")
+    def user_set_status(self, status):
+        """ possibly unsupported. cf. `PlugAPI.prototype.setStatus`.
+        @status: integer.
+        """
+        return self._put("users/status", json={"status": status})
+
+    def get_all_staff(self):
+        return self._get("staff")
+
+    def meh(self, history_id):
+        # so what happens when abs(direction) != 1?
+        json = {"direction": -1, "historyID": history_id}
+        return self._post("votes", json=json)
+
+    def woot(self, history_id):
+        json = {"direction": 1, "historyID": history_id}
+        return self._post("votes", json=json)
+
+    def grab(self, playlist_id, history_id):
+        json = {"playlistID": playlist_id, "historyID": history_id}
+        return self._post("grabs", json=json)
 
 class SockBase(object):
     """ whose primary purpose is to receive pushes and send chats. """
