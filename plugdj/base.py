@@ -61,8 +61,8 @@ class PlugREST(object):
     def chat_delete(self):
         raise NotImplemented("chat/")
 
-    def history(self):
-        raise NotImplemented("rooms/history")
+    def room_history(self):
+        return self._get("rooms/history")
 
     def moderate_add_dj(self. user_id):
         """ adds a dj to the waitlist (nee booth). """
@@ -88,23 +88,25 @@ class PlugREST(object):
         json = {"userID": user_id, "position": position}
         return self._post("booth/move", json=json)
 
-    def moderate_mute(self):
-        raise NotImplemented("mutes")
+    def moderate_mute_user(self, user_id, reason, duration):
+        json = {"userID": user_id, "reason": reason, "duration": duration}
+        return self._post("mutes", json=json)
 
-    def moderate_permissions(self):
-        raise NotImplemented("staff/update")
+    def moderate_set_role(self):
+        json = {"userID": user_id, "role": role}
+        return self._post("staff/update", json=json)
 
-    def moderate_remove_dj(self):
-        raise NotImplemented("booth/remove/")
+    def moderate_remove_dj(self, user_id):
+        return self._delete("booth/remove/%s" % user_id)
 
-    def moderate_staff(self):
-        raise NotImplemented("staff/")
+    def moderate_unmod_user(self, user_id):
+        return self._delete("staff/%s" % user_id)
 
-    def moderate_unban(self):
-        raise NotImplemented("bans/")
+    def moderate_unban(self, user_id):
+        return self._delete("bans/%s" % user_id)
 
-    def moderate_unmute(self):
-        raise NotImplemented("mutes/")
+    def moderate_unmute(self, user_id):
+        return self._delete("mutes/%s" % user_id)
 
     def activate_playlist(self, playlist_id):
         return self._put("playlists/%s/activate" % playlist_id)
@@ -128,8 +130,10 @@ class PlugREST(object):
     def room_cycle_booth(self):
         raise NotImplemented("booth/cycle")
 
-    def room_info(self):
-        raise NotImplemented("rooms/update")
+    def change_room_info(self, name, description, welcome_msg):
+        json = {"name": name, "description": description, "welcome":
+                welcome_msg}
+        return self._post("rooms/update", json=json)
 
     def moderate_lock_wait_list(self, locked, clear):
         return self._put("booth/lock", json={"isLocked": locked,
