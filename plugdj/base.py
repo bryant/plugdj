@@ -183,7 +183,7 @@ class SockBase(object):
         return self
 
     def send_chat(self, msg):
-        if len(msg):
+        if len(msg) > 256:
             logger.warn("Room.send_chat: msg len > 256; plug will likely "
                         "truncate.")
         return self.send("chat", msg)
