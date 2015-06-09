@@ -64,7 +64,7 @@ class PlugREST(object):
     def room_history(self):
         return self._get("rooms/history")
 
-    def moderate_add_dj(self. user_id):
+    def moderate_add_dj(self, user_id):
         """ adds a dj to the waitlist (nee booth). """
         return self._post("booth/add", json={"id": user_id})
 
