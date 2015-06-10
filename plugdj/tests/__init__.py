@@ -35,4 +35,8 @@ def test_get_room_state():
     assert is_ok(p.join_room(creds.room))
     assert is_ok(p.room_state())
 
-p = get_plug()
+# cached instance for tests that don't require a fresh one
+p = None
+def setup_module():
+    global p
+    p = get_plug()
