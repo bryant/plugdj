@@ -35,7 +35,8 @@ class PlugREST(object):
 
     def login(self, email, password):
         # request root of site
-        csrf = js_var("_csrf", self._get_root().text)
+        resp = self._get_root().text
+        csrf = js_var("_csrf", resp)
         if csrf is None:
             raise LoginError(resp)
 
